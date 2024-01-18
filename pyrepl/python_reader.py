@@ -27,7 +27,7 @@ from pyrepl.historical_reader import HistoricalReader
 from pyrepl import completing_reader, reader
 from pyrepl import commands, completer
 from pyrepl import module_lister
-import imp, sys, os, re, code, traceback
+import sys, os, re, code, traceback
 import atexit, warnings
 
 try:
@@ -36,7 +36,7 @@ except:
     unicode = str
 
 try:
-    imp.find_module("twisted")
+    import twisted
 except ImportError:
     default_interactmethod = "interact"
 else:
@@ -79,9 +79,9 @@ class maybe_accept(commands.Command):
                 self.finish = 1
 
 from_line_prog = re.compile(
-    "^from\s+(?P<mod>[A-Za-z_.0-9]*)\s+import\s+(?P<name>[A-Za-z_.0-9]*)")
+    r"^from\s+(?P<mod>[A-Za-z_.0-9]*)\s+import\s+(?P<name>[A-Za-z_.0-9]*)")
 import_line_prog = re.compile(
-    "^(?:import|from)\s+(?P<mod>[A-Za-z_.0-9]*)\s*$")
+    r"^(?:import|from)\s+(?P<mod>[A-Za-z_.0-9]*)\s*$")
 
 def saver(reader=reader):
     try:
@@ -392,7 +392,8 @@ def main(use_pygame_console=0, interactmethod=default_interactmethod, print_bann
         sys.path.insert(0, os.getcwd())
 
         if clear_main and __name__ != '__main__':
-            mainmod = imp.new_module('__main__')
+            from types import ModuleType
+            mainmod = ModuleType('__main__')
             sys.modules['__main__'] = mainmod
         else:
             mainmod = sys.modules['__main__']
